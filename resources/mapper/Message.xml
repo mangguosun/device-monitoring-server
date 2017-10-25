@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace 命名空间，避免相同项目中命名冲突。 值一般为当前映射对象的全类名。 -->
+<mapper namespace="cn.dunn.im.model.Message">
+
+	<resultMap type="cn.dunn.im.model.Message" id="Message">
+		<result property="id" column="_id" />
+		<result property="from" column="_from" />
+		<result property="to" column="_to" />
+		<result property="type" column="_type" />
+		<result property="body" column="_body" />
+		<result property="createTime" column="_createTime" />
+	</resultMap>
+
+
+	<resultMap type="cn.dunn.im.model.Message" id="UnReadMessage">
+		<result property="id" column="_id" />
+		<result property="from" column="_from" />
+		<result property="to" column="_to" />
+		<result property="type" column="_type" />
+		<result property="body" column="_body" />
+		<result property="createTime" column="_createTime" />
+		<association property="user" javaType="cn.dunn.im.model.User">
+			<result property="userid" column="_userid" />
+			<result property="username" column="_username" />
+			<result property="autograph" column="_autograph" />
+			<result property="nickname" column="_nickname" />
+			<result property="headImg" column="_headImg" />
+		</association>
+	</resultMap>
+
+	<insert id="save" parameterType="cn.dunn.im.model.Message">
+		insert into
+		im_message(_from,
+		_to,
+		_type, _body,_createTime)
+		values(#{from},#{to}, #{type},
+		#{body},#{createTime})
+	</insert>
+	<select id="getAll" resultMap="Message">
+		select * from im_message where 1=1
+		<if test="@Ognl@isNotEmpty(from)">AND _from = #{from}</if>
+		<if test="@Ognl@isNotEmpty(to)">AND _to = #{to}</if>
+		<if test="@Ognl@isNotEmpty(createTime)">AND _createTime > #{createTime}</if>
+		<if test="@Ognl@isNotEmpty(type)">AND _type = #{type}</if>
+	</select>
+
+	<select id="getUnReadMessage" resultMap="UnReadMessage">
+		SELECT
+		im_m.*,
+		im_u.*
+		FROM
+		im_message im_m,
+		im_friend_dnexus im_f_d,
+		im_user im_u
+		WHERE
+		im_f_d._self
+		= im_m._to
+		AND im_f_d._another = im_m._from
+
+		AND im_m._to = #{self}
+		AND im_m._from = #{another}
+
+
+		AND im_m._createTime > im_f_d._lastReadTime
+		AND im_u._userid = im_m._from
+		order by im_m._createTime desc
+		limit 0,20
+	</select>
+
+	<select id="getUnReadMessageCount" resultType="int">
+		SELECT
+		count(1)
+		FROM
+		im_message im_m,
+		im_friend_dnexus im_f_d,
+		im_user im_u
+		WHERE
+		im_f_d._self = im_m._to
+		AND im_f_d._another = im_m._from
+		AND im_m._to =
+		#{self}
+		AND im_m._from = #{another}
+		AND im_m._createTime >
+		im_f_d._lastReadTime
+		AND im_u._userid = im_m._from
+	</select>
+
+
+	<select id="getGroupUnReadMessage" resultMap="UnReadMessage">
+		SELECT
+		im_m.*,
+		im_u.*
+		FROM
+		im_chat_member im_c_m
+		LEFT JOIN im_chat_group im_c_g ON
+		im_c_m._chatGroupId = im_c_g._id
+		LEFT JOIN im_message im_m ON im_m._to
+		= im_c_g._id
+		LEFT JOIN im_user im_u ON im_u._userid = im_m._from
+		WHERE
+		im_c_m._memberId = #{userid}
+		AND im_m._type = 'chatgroup'
+		AND im_m._createTime > im_c_m._lastReadTime
+		AND im_c_g._id = #{groupid}
+		order by im_m._createTime desc
+		limit 0,20
+
+
+
+	</select>
+
+	<select id="getGroupUnReadMessageCount" resultType="int">
+		SELECT
+		count(1)
+		FROM
+		im_chat_member im_c_m
+		LEFT JOIN im_chat_group im_c_g ON
+		im_c_m._chatGroupId = im_c_g._id
+		LEFT JOIN im_message im_m ON im_m._to
+		= im_c_g._id
+		LEFT JOIN im_user im_u ON im_u._userid = im_m._from
+		WHERE
+		im_c_m._memberId = #{userid}
+		AND im_m._type = 'chatgroup'
+		AND
+		im_m._createTime > im_c_m._lastReadTime
+		AND im_c_g._id = #{groupid}
+	</select>
+
+	<select id="getHistoryMessage" resultMap="UnReadMessage">
+		SELECT
+		im_m.*, im_u.*
+		FROM
+		im_message im_m LEFT JOIN
+		im_user im_u
+		on
+		im_u._userid = im_m._from
+		where
+		im_m._createTime &lt; #{time}
+		AND im_m._type = 'chat'
+		AND ((im_m._from = #{selt} AND im_m._to = #{another}) OR (im_m._to = #{selt} AND im_m._from = #{another}))
+		order by im_m._createTime desc
+		LIMIT 0,20
+
+
+	</select>
+
+	<select id="getChatGroupHistoryMessage" resultMap="UnReadMessage">
+		<!-- SELECT -->
+		<!-- im_m.*, -->
+		<!-- im_u.* -->
+		<!-- FROM -->
+		<!-- im_message im_m, -->
+		<!-- im_chat_member im_c_m, -->
+		<!-- im_user im_u -->
+		<!-- WHERE -->
+		<!-- im_m._to = im_c_m._chatGroupId -->
+		<!-- AND im_u._userid = im_c_m._memberId -->
+		<!-- AND -->
+		<!-- im_m._createTime &lt; #{time} -->
+		<!-- AND im_m._to = #{groupid} -->
+		<!-- AND im_m._type = -->
+		<!-- 'chatgroup' -->
+		<!-- order by im_m._createTime desc -->
+		<!-- LIMIT 0,20; -->
+
+		SELECT
+		im_m.*, im_u.*
+		FROM
+		im_message im_m
+		LEFT JOIN im_user im_u ON im_m._from = im_u._userid
+		WHERE
+		im_m._type = 'chatgroup'
+		AND im_m._to = #{groupid}
+		AND im_m._createTime &lt; #{time}
+		ORDER BY
+		im_m._createTime desc
+		LIMIT 0, 20
+
+
+
+	</select>
+
+	<update id="updateChatLastReadTime">
+		update im_friend_dnexus set _lastReadTime = #{time} where _self = #{userid} and _another = #{another}
+	</update>
+	<update id="updateChatGroupLastReadTime">
+		update im_chat_member set _lastReadTime = #{time} where _memberId = #{userid} and _chatGroupId = #{another}
+	</update>
+
+</mapper>

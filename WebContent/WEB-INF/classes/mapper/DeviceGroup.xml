@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace 命名空间，避免相同项目中命名冲突。 值一般为当前映射对象的全类名。 -->
+<mapper namespace="cn.dunn.im.model.DeviceGroup">
+
+	<resultMap type="cn.dunn.im.model.DeviceGroup" id="DeviceGroup">
+		<result property="id" column="_id" />
+		<result property="groupName" column="_groupName" />
+		<result property="pertain" column="_pertain" />
+	</resultMap>
+
+	<resultMap type="cn.dunn.im.model.Device" id="Device">
+		<result property="deviceid" column="_deviceid" />
+		<result property="devicename" column="_devicename" />
+		<result property="password" column="_password" />
+		<result property="deviceip" column="_deviceip" />
+		<result property="autograph" column="_autograph" />
+		<result property="registerTime" column="_registerTime" />
+	</resultMap>
+
+
+
+	<insert id="save" parameterType="cn.dunn.im.model.DeviceGroup">
+		insert into
+		im_device_group
+		values(#{id},#{groupName}, #{pertain})
+	</insert>
+	<select id="getAll" resultMap="DeviceGroup">
+		select * from im_device_group
+		where 1=1 order by _id desc
+	</select>
+
+	<select id="getMyGroup" resultMap="DeviceGroup">
+		SELECT
+		im_f_g.*
+		FROM
+		im_device_group im_d_g
+		LEFT JOIN im_user im_u ON im_d_g._pertain =
+		im_u._userid
+		WHERE
+		im_u._userid = #{userid}
+	</select>
+	
+	<select id="getGroupAllDevice" resultMap="Device">
+		SELECT
+		im_d.*
+		FROM
+		im_device im_d
+		LEFT JOIN im_device_dnexus im_d_d ON
+		im_d_d._self= im_d._deviceid
+		WHERE
+		im_d_d._groupId = #{groupid}
+	</select>
+	
+	<select id="getGroupDevice" resultMap="Device">
+		SELECT
+		im_d.*
+		FROM
+		im_device_dnexus im_d_d
+		LEFT JOIN im_device_group im_d_g ON im_d_d._groupId = im_d_g._id
+		LEFT JOIN im_device im_d ON im_d_d._self = im_d._deviceid
+		WHERE
+		im_d_d._another = #{userid}
+		AND im_d_g._id = #{groupid} 
+		ORDER BY im_d._deviceid ASC
+	</select>
+	
+</mapper>

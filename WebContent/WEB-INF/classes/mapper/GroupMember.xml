@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace 命名空间，避免相同项目中命名冲突。 值一般为当前映射对象的全类名。 -->
+<mapper namespace="cn.dunn.im.model.GroupMember">
+
+	<resultMap type="cn.dunn.im.model.GroupMember" id="GroupMember">
+		<result property="id" column="_id" />
+		<result property="chatGroupId" column="_chatGroupId" />
+		<result property="memberId" column="_memberId" />
+		<result property="lastReadTime" column="_lastReadTime" />
+	</resultMap>
+	<insert id="save" parameterType="cn.dunn.im.model.GroupMember">
+		insert into
+		im_chat_member
+		values(#{id}, #{chatGroupId}, #{memberId}, #{lastReadTime})
+	</insert>
+	<select id="getAll" resultMap="GroupMember">
+		select * from im_chat_member where 1=1
+	</select>
+</mapper>

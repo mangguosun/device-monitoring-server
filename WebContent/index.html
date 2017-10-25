@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<table style="TABLE-LAYOUT: fixed; WORD-BREAK: break-all">
+		<tr>
+			<td rowspan="2" valign="top">
+				<img alt="头像" src="file:///D:/workroot/workflow/IMClient/resources/main/img/head.png" onclick="app.login()" style="cursor: pointer;">
+			</td>
+			<td>
+				<span style="cursor: pointer; color: #3394e2;">李四</span>
+			</td>
+		</tr>
+		<tr>
+			<td rowspan="2" style="WORD-BREAK: break-all; WORD-WRAP: break-word">
+				<div id='content' style='background-color: #acd9f8; border-radius: 12px; font-size: 18px; padding: 6px; color: #3394e2;'
+					onmouseout="document.getElementById('content').innerHTML=11;" onmouseover="events('移入')">sadasddasdsadasd</div>
+			</td>
+		</tr>
+	</table>
+	<br>
+
+</body>
+<script type="text/javascript">
+	function events() {
+		document.getElementById('content').innerHTML=11222;
+	}
+</script>
+</html>

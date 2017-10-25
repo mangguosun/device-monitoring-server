@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace 命名空间，避免相同项目中命名冲突。 值一般为当前映射对象的全类名。 -->
+<mapper namespace="cn.dunn.im.model.User">
+
+	<resultMap type="cn.dunn.im.model.User" id="User">
+		<result property="userid" column="_userid" />
+		<result property="username" column="_username" />
+		<result property="password" column="_password" />
+		<result property="nickname" column="_nickname" />
+		<result property="autograph" column="_autograph" />
+		<result property="headImg" column="_headImg" />
+		<result property="registerTime" column="_registerTime" />
+		<result property="headMD5" column="_headMD5" />
+	</resultMap>
+	<insert id="save" parameterType="cn.dunn.im.model.User">
+		INSERT INTO im_user
+		VALUES(#{userid},#{username},#{password},#{nickname},#{autograph},#{headImg},#{registerTime},${headMD5})
+	</insert>
+	<select id="getAll" resultMap="User">
+		select * from im_user where 1=1
+	</select>
+
+	<select id="getUserByUsername" resultMap="User" parameterType="map">
+		select * from im_user where _username = #{username}
+	</select>
+
+
+	<select id="getById" resultMap="User">
+		select * from im_user where
+		_userid = #{userid}
+	</select>
+
+	<update id="updateUserInfo" parameterType="cn.dunn.im.model.User">
+		UPDATE im_user SET
+		<trim suffixOverrides="," suffix="">
+			<if test="@Ognl@isNotEmpty(nickname)">_nickname = #{nickname},</if>
+			<if test="@Ognl@isNotEmpty(autograph)">_autograph = #{autograph},</if>
+			<if test="@Ognl@isNotEmpty(headImg)">_headImg = #{headImg},</if>
+		</trim>
+		WHERE _userid = #{userid}
+	</update>
+</mapper>

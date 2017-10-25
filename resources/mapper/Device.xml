@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace 命名空间，避免相同项目中命名冲突。 值一般为当前映射对象的全类名。 -->
+<mapper namespace="cn.dunn.im.model.Device">
+
+	<resultMap type="cn.dunn.im.model.Device" id="Device">
+		<result property="deviceid" column="_deviceid" />
+		<result property="devicename" column="_devicename" />
+		<result property="password" column="_password" />
+		<result property="deviceip" column="_deviceip" />
+		<result property="devicemac" column="_devicemac" />
+		<result property="autograph" column="_autograph" />
+		<result property="registerTime" column="_registerTime" />
+	</resultMap>
+	<insert id="save" parameterType="cn.dunn.im.model.Device" useGeneratedKeys="true" keyProperty="_deviceid">
+	    insert into
+		im_device(_devicename,
+		_password,
+		_deviceip,_devicemac, _autograph,_registerTime)
+		VALUES(#{devicename},#{password},#{deviceip},#{devicemac},#{autograph},#{registerTime})
+	</insert>
+	
+	
+	<insert id="savednexu" parameterType="cn.dunn.im.model.DeviceNexus" useGeneratedKeys="true" keyProperty="_id">
+	    insert into
+		im_device_dnexus(_self,
+		_another,
+		_lastReadTime, _groupId)
+		VALUES(#{self},#{another},#{lastreadtime},#{groupid})
+	</insert>	
+	
+	<select id="getAll" resultMap="Device">
+		select * from im_device where 1=1
+	</select>
+
+	<select id="getByDevicename" resultMap="Device" parameterType="map">
+		select * from im_device where _devicename = #{devicename}
+	</select>
+
+
+	<select id="getById" resultMap="Device">
+		select * from im_device where _deviceid = #{deviceid}
+	</select>
+	
+	<select id="getByIp" resultMap="Device" parameterType="map">
+		select * from im_device where _deviceip = #{deviceip}
+	</select>
+	<select id="getByMac" resultMap="Device" parameterType="map">
+		select * from im_device where _devicemac = #{devicemac}
+	</select>
+	<update id="updateDeviceInfo" parameterType="cn.dunn.im.model.Device">
+		UPDATE im_device SET
+		<trim suffixOverrides="," suffix="">
+		    <if test="@Ognl@isNotEmpty(devicename)">_devicename = #{devicename},</if>
+			<if test="@Ognl@isNotEmpty(deviceip)">_deviceip = #{deviceip},</if>
+			<if test="@Ognl@isNotEmpty(devicemac)">_devicemac = #{devicemac},</if>
+			<if test="@Ognl@isNotEmpty(autograph)">_autograph = #{autograph},</if>
+			<if test="@Ognl@isNotEmpty(registerTime)">_registerTime = #{registerTime},</if>
+		</trim>
+		WHERE _deviceid = #{deviceid}
+	</update>
+</mapper>

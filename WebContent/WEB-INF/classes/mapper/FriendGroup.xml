@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace 命名空间，避免相同项目中命名冲突。 值一般为当前映射对象的全类名。 -->
+<mapper namespace="cn.dunn.im.model.FriendGroup">
+
+	<resultMap type="cn.dunn.im.model.FriendGroup" id="FriendGroup">
+		<result property="id" column="_id" />
+		<result property="groupName" column="_groupName" />
+		<result property="pertain" column="_pertain" />
+	</resultMap>
+
+	<resultMap type="cn.dunn.im.model.User" id="User">
+		<result property="userid" column="_userid" />
+		<result property="username" column="_username" />
+		<result property="password" column="_password" />
+		<result property="nickname" column="_nickname" />
+		<result property="autograph" column="_autograph" />
+		<result property="headImg" column="_headImg" />
+		<result property="registerTime" column="_registerTime" />
+	</resultMap>
+
+
+
+	<insert id="save" parameterType="cn.dunn.im.model.FriendGroup">
+		insert into
+		im_friend_group
+		values(#{id},#{groupName}, #{pertain})
+	</insert>
+	<select id="getAll" resultMap="FriendGroup">
+		select * from im_friend_group
+		where 1=1
+	</select>
+
+	<select id="getMyGroup" resultMap="FriendGroup">
+		SELECT
+		im_f_g.*
+		FROM
+		im_friend_group im_f_g
+		LEFT JOIN im_user im_u ON im_f_g._pertain =
+		im_u._userid
+		WHERE
+		im_u._userid = #{userid}
+	</select>
+
+	<select id="getGroupFriend" resultMap="User">
+		SELECT
+		im_u.*
+		FROM
+		im_friend_dnexus im_f_d
+		LEFT JOIN im_friend_group im_f_g ON
+		im_f_d._groupId = im_f_g._id
+		LEFT JOIN im_user im_u ON im_f_d._another
+		= im_u._userid
+		WHERE
+		im_f_g._pertain = #{userid}
+		AND im_f_g._id = #{groupid}
+	</select>
+	
+</mapper>

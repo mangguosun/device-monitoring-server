@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace 命名空间，避免相同项目中命名冲突。 值一般为当前映射对象的全类名。 -->
+<mapper namespace="cn.dunn.im.model.FriendNexus">
+
+	<resultMap type="cn.dunn.im.model.FriendNexus" id="FriendNexus">
+		<result property="id" column="_id" />
+		<result property="self" column="_self" />
+		<result property="another" column="_another" />
+		<result property="lastReadTime" column="_lastReadTime" />
+		<result property="groupId" column="_groupId" />
+	</resultMap>
+	<insert id="save" parameterType="cn.dunn.im.model.FriendNexus">
+		insert into
+		im_friend_dnexus
+		values(#{id}, #{self},
+		#{another},#{lastReadTime},#{groupId})
+	</insert>
+	<select id="getAll" resultMap="FriendNexus">
+		select * from im_friend_dnexus
+		where 1=1
+	</select>
+
+	<select id="isFriendNexus" parameterType="cn.dunn.im.model.FriendNexus"
+		resultMap="FriendNexus">
+		select * from im_friend_dnexus where _self = #{self} and
+		_another = #{another}
+	</select>
+
+
+	<resultMap type="cn.dunn.im.model.User" id="User">
+		<result property="userid" column="_userid" />
+		<result property="username" column="_username" />
+		<result property="password" column="_password" />
+		<result property="nickname" column="_nickname" />
+		<result property="autograph" column="_autograph" />
+		<result property="headImg" column="_headImg" />
+		<result property="registerTime" column="_registerTime" />
+	</resultMap>
+
+
+
+	<select id="getAllFriends" resultMap="User">
+		SELECT
+		im_u.*
+		FROM
+		im_friend_dnexus im_f_d,
+		im_user im_u
+		WHERE
+		im_u._userid = im_f_d._another
+		AND _self = #{userid}
+	</select>
+</mapper>

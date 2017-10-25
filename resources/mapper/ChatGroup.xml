@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace 命名空间，避免相同项目中命名冲突。 值一般为当前映射对象的全类名。 -->
+<mapper namespace="cn.dunn.im.model.ChatGroup">
+
+	<resultMap type="cn.dunn.im.model.ChatGroup" id="ChatGroup">
+		<result property="id" column="_id" />
+		<result property="chatGroupName" column="_chatGroupName" />
+		<result property="theme" column="_theme" />
+		<result property="headImg" column="_headImg" />
+	</resultMap>
+
+	<resultMap type="cn.dunn.im.model.User" id="User">
+		<result property="userid" column="_userid" />
+		<result property="username" column="_username" />
+		<result property="password" column="_password" />
+		<result property="nickname" column="_nickname" />
+		<result property="autograph" column="_autograph" />
+		<result property="headImg" column="_headImg" />
+		<result property="registerTime" column="_registerTime" />
+		<result property="groupRole" column="_groupRole" />
+		<result property="chatGroupId" column="_chatGroupId" />
+	</resultMap>
+
+	<insert id="save" parameterType="cn.dunn.im.model.ChatGroup">
+		insert into
+		im_chat_group
+		values(#{id}, #{chatGroupName}, #{theme}, #{headImg})
+	</insert>
+	<select id="getAll" resultMap="ChatGroup">
+		select * from im_chat_group where
+		1=1
+	</select>
+
+	<select id="getMyChatGroup" resultMap="ChatGroup">
+		SELECT
+		im_c_g.*
+		FROM
+		im_chat_member im_c_m
+		LEFT JOIN im_chat_group im_c_g ON
+		im_c_m._chatGroupId = im_c_g._id
+		WHERE
+		im_c_m._memberId = #{userid}
+	</select>
+
+
+	<select id="getGroupMember" resultMap="User">
+		SELECT
+		im_u.*,
+		im_c_m._groupRole
+		FROM
+		im_chat_group im_c_g
+		LEFT JOIN im_chat_member
+		im_c_m ON im_c_g._id = im_c_m._chatGroupId
+		LEFT JOIN im_user im_u ON
+		im_u._userid = im_c_m._memberId
+		WHERE
+		im_c_g._id = #{groupid}
+	</select>
+
+	<select id="getAllGroupMember" resultMap="User">
+		SELECT
+		im_u.*,
+		b._chatGroupId
+		FROM
+		im_chat_member b
+		LEFT
+		JOIN im_user im_u ON
+		im_u._userid = b._memberId
+		WHERE
+		b._chatGroupId IN
+		(
+		SELECT
+		_chatGroupId
+		FROM
+		im_chat_member a
+		WHERE
+		a._memberId = #{userid}
+		)
+		AND im_u._userid !=
+		#{userid}
+	</select>
+</mapper>

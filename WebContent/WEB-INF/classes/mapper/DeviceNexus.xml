@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace 命名空间，避免相同项目中命名冲突。 值一般为当前映射对象的全类名。 -->
+<mapper namespace="cn.dunn.im.model.DeviceNexus">
+
+	<resultMap type="cn.dunn.im.model.DeviceNexus" id="DeviceNexus">
+		<result property="id" column="_id" />
+		<result property="self" column="_self" />
+		<result property="another" column="_another" />
+		<result property="lastReadTime" column="_lastReadTime" />
+		<result property="groupId" column="_groupId" />
+	</resultMap>
+	<insert id="save" parameterType="cn.dunn.im.model.DeviceNexus">
+		insert into
+		im_device_dnexus
+		values(#{id}, #{self},#{another},#{lastReadTime},#{groupId})
+	</insert>
+	<select id="getAll" resultMap="DeviceNexus">
+		select * from im_device_dnexus
+		where 1=1
+	</select>
+
+	<select id="isDeviceNexus" parameterType="cn.dunn.im.model.DeviceNexus" resultMap="DeviceNexus">
+		select * from im_device_dnexus where _self = #{self} and _another = #{another}
+	</select>
+
+
+	<resultMap type="cn.dunn.im.model.Device" id="Device">
+		<result property="deviceid" column="_deviceid" />
+		<result property="devicename" column="_devicename" />
+		<result property="password" column="_password" />
+		<result property="deviceip" column="_deviceip" />
+		<result property="autograph" column="_autograph" />
+		<result property="registerTime" column="_registerTime" />
+	</resultMap>
+
+
+
+	<select id="getAllDevices" resultMap="Device">
+		SELECT
+		im_d.*
+		FROM
+		im_device_dnexus im_d_d,
+		im_device im_d
+		WHERE
+		im_d._deviceid = im_d_d._another
+		AND _self = #{deviceid}
+	</select>
+</mapper>
